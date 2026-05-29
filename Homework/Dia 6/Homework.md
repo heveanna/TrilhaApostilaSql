@@ -1,0 +1,1 @@
+Fazer uma procedure para atualização e para exclusão de [dbo].[Lancamento].
