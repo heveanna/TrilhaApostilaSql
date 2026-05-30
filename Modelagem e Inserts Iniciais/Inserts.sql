@@ -29,17 +29,6 @@ BEGIN TRY
 					(4, 2, 10004, GETDATE());
 		PRINT 'Contas inseridas com sucesso'
 
-		INSERT INTO [dbo].[Conta](IdCliente, IdAgencia, Numero, DataCadastro)
-			VALUES	(1, 1, 10001, GETDATE()),
-					(1, 2, 10001, GETDATE()),
-					(3, 1, 10002, GETDATE()),
-					(3, 2, 10002, GETDATE()),
-					(5, 1, 10003, GETDATE()),
-					(5, 2, 10003, GETDATE()),
-					(2, 1, 10004, GETDATE()),
-					(4, 2, 10004, GETDATE());
-		PRINT 'Contas inseridas com sucesso'
-
 		INSERT INTO [dbo].[Saldo](IdConta, Credito, Debito, SaldoInicial, DataSaldo)
 			VALUES	(1, 0.00, 0.00, 0.00, GETDATE()),
 					(2, 0.00, 0.00, 0.00, GETDATE()),
