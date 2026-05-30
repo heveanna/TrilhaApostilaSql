@@ -1,5 +1,6 @@
 -- HOMEWORK: Criar scripts que incluam lançamento e atualizem saldo (30 lançamentos de diversas contas)
-
+USE RicBank2;
+GO
 -- 1
 
 INSERT INTO [dbo].[Lancamento] (IdSaldo, DataLancamento, Historico, DebCre, Valor)

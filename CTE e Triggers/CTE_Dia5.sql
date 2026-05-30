@@ -1,4 +1,5 @@
 USE RicBank2;
+GO
 
 WITH Lancamento_Temp AS	(
 							SELECT	IdSaldo,
@@ -24,3 +25,4 @@ SELECT	Re.IdSaldo,
 	FROM [dbo].[Saldo] AS Sd WITH(NOLOCK)
 		INNER JOIN Resumo AS Re
 			ON Sd.Id = Re.IdSaldo
+GO

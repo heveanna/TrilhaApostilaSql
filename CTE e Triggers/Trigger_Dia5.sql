@@ -1,3 +1,6 @@
+USE RicBank2;
+GO
+
 IF EXISTS(SELECT 1 FROM [dbo].[sysobjects] WHERE Id = OBJECT_ID(N'[dbo].[TRG_AtualizarSaldo]') AND TYPE = 'TR')
 	BEGIN
 		DROP TRIGGER [dbo].[TRG_AtualizarSaldo]
@@ -39,6 +42,7 @@ CREATE TRIGGER [dbo].[TRG_AtualizarSaldo]
                             ON Sd.Id = inserted.IdSaldo
             END
     END
+GO
 
  INSERT INTO [dbo].[Lancamento] (IdSaldo, DataLancamento, Historico, DebCre, Valor)
     VALUES (8, GETDATE(), 'Transferência recebida - TED', 'C', 100.00);
