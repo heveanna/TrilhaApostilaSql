@@ -30,20 +30,20 @@ CREATE PROC [dbo].[UpdateLancamento]
 
 		Exemplo:
 			BEGIN TRAN
-				DECLARE	@DataInicial DATETIME  = GETDATE();
+				DECLARE	@RET INT,
+						@DataInicial DATETIME  = GETDATE();
 					
-				EXEC [dbo].[UpdateLancamento]	@IdLancamento = 1,
+				EXEC @RET = [dbo].[UpdateLancamento]	@IdLancamento = 1,
 												@IdSaldo = NULL, -- Por padrão, quando não preenchido, o valor é nulo. Ou seja, esse campo é desnecessário.
 												@DataLancamento = @DataInicial,
 												@Historico = 'Teste UpdateLancamento',
 												@DebCre = 'D',
 												@Valor = 50000;
-				SELECT	Id,
-						IdSaldo,
-						DataLancamento,
-						Historico,
-						DebCre,
-						Valor
+
+				SELECT	@RET AS Retorno,
+						DATEDIFF(MILLISECOND, @DataInicial, GETDATE()) AS 'Tempo (ms)';
+
+				SELECT	*
 					FROM [dbo].[Lancamento] WITH(NOLOCK)
 					WHERE Id = 1;
 
@@ -60,38 +60,35 @@ CREATE PROC [dbo].[UpdateLancamento]
 			GO
 
 		
-		Retornos:	Erro:		Exibir as duas tabelas com valores iguais ou
-								exibir nenhum valor nas tabelas.
-					
-					Sucesso:	Exibir a primeira tabela com os novos valores
-								e a segunda com os valores antigos.
+		Retornos:	Erro:		-1 - Falha na Execução
+					Sucesso:	Exibir Id do lançamento atualizado.
 	*/
 	BEGIN
 
-		BEGIN TRY
+		IF NOT EXISTS	(
+							SELECT 1 FROM [dbo].[Lancamento] WITH(NOLOCK)
+								WHERE Id = @IdLancamento
+						)
+			BEGIN
+				PRINT 'Erro: Lançamento não encontrado.';
+				RETURN -1;
+				END
 
-			BEGIN TRAN
+		UPDATE [dbo].[Lancamento]
+			SET	IdSaldo = ISNULL(@IdSaldo, IdSaldo),
+				DataLancamento = ISNULL(@DataLancamento, DataLancamento),
+				Historico = ISNULL(@Historico, Historico),
+				DebCre = ISNULL(@DebCre, DebCre),
+				Valor = ISNULL(@Valor, Valor)
+			WHERE Id = @IdLancamento
 
-				UPDATE [dbo].[Lancamento]
-					SET	IdSaldo = ISNULL(@IdSaldo, IdSaldo),
-						DataLancamento = ISNULL(@DataLancamento, DataLancamento),
-						Historico = ISNULL(@Historico, Historico),
-						DebCre = ISNULL(@DebCre, DebCre),
-						Valor = ISNULL(@Valor, Valor)
-					WHERE Id = @IdLancamento
+		IF @@ERROR <> 0
+			BEGIN	
+				PRINT 'Erro: Falha na execução da atualização.';
+				RETURN -1;
+				END
 
-				COMMIT TRAN
-				PRINT 'Sucesso: Lançamento atualizado.';
-
-			END TRY
-
-			BEGIN CATCH
-
-				IF @@TRANCOUNT > 0
-					ROLLBACK TRAN;
-				PRINT 'Erro: não foi possível realizar a atualização.'
-
-				END CATCH
+		RETURN @IdLancamento;
 
 		END
 GO

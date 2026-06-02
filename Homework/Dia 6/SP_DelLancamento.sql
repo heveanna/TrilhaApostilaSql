@@ -79,6 +79,3 @@ CREATE PROC [dbo].[SP_DelLancamento]
 	END
 GO
 		
-
-
-
