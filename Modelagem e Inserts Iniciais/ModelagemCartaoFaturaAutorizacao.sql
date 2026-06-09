@@ -28,7 +28,8 @@ CREATE TABLE Autorizacao(
 							IdFatura	INT				NOT NULL,
 							Valor		DECIMAL(10,2)	NOT NULL,
 							DataHora	DATETIME		NOT NULL,
-							Loja		VARCHAR(255)	NOT NULL
+							Loja		VARCHAR(255)	NOT NULL,
+							Autorizado 	BIT				NOT NULL
 
 							CONSTRAINT	PK_IdAutorizacao		PRIMARY KEY (Id),
 							CONSTRAINT	FK_IdFatura_Autorizacao	FOREIGN KEY	(IdFatura)	REFERENCES Fatura (Id)
