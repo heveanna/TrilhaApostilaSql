@@ -16,7 +16,8 @@ CREATE TABLE Fatura(
 						IdCartao		INT				NOT NULL,
 						Numero			INT				NOT NULL,
 						Saldo			DECIMAL(10,2)	NOT NULL,
-						DataFechamento	DATETIME		NOT NULL
+						DataFechamento	DATETIME		NOT NULL,
+						Pago			BIT				CONSTRAINT DF_Pago_Fatura DEFAULT 0,
 
 						CONSTRAINT	PK_IdFatura			PRIMARY KEY (Id),
 						CONSTRAINT	FK_IdCartao_Fatura	FOREIGN KEY (IdCartao) REFERENCES Cartao (Id),
