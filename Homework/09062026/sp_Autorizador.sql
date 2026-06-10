@@ -57,7 +57,7 @@ CREATE PROC [dbo].[sp_Autorizador]
 														INNER JOIN [dbo].[Fatura] as fa
 															ON fa.Id = au.IdFatura
 														INNER JOIN [dbo].[Cartao] as ca
-															ON ca.Id = au.IdFatura
+															ON ca.Id = fa.IdCartao
 													WHERE au.Id = @IdAutorizacao
 											);
 

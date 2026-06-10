@@ -24,6 +24,7 @@ CREATE TRIGGER [dbo].[trg_AutualizarSaldoSeAutorizacaoPermitida]
 						FROM [dbo].[Fatura] as fa
 							INNER JOIN deleted d
 								ON fa.Id = d.IdFatura
+									AND d.Autorizado = 1
 				END
 
 			IF EXISTS ( SELECT 1 FROM inserted WHERE Autorizado = 1 )
