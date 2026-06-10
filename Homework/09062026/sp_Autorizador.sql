@@ -30,9 +30,9 @@ CREATE PROC [dbo].[sp_Autorizador]
 						SET @IdFaturaTeste = SCOPE_IDENTITY();
 
 						EXEC @IdAutorizacaoTeste = [dbo].[sp_InsInclusao]	@IdFatura	= @IdFaturaTeste,
-																		@Valor		= 10,
-																		@DataHora	= @DataInicial,
-																		@Loja		= 'Lojinha legal'
+																			@Valor		= 10,
+																			@DataHora	= @DataInicial,
+																			@Loja		= 'Lojinha legal'
 
 						EXEC @Retorno = [dbo].[sp_Autorizador]	@IdAutorizacao = @IdAutorizacaoTeste;
 
@@ -114,11 +114,11 @@ BEGIN TRAN
 	SET @IdFaturaTeste = SCOPE_IDENTITY();
 
 	EXEC @IdAutorizacaoTeste = [dbo].[sp_InsInclusao]	@IdFatura	= @IdFaturaTeste,
-													@Valor		= 10,
-													@DataHora	= @DataInicial,
-													@Loja		= 'Lojinha legal'
+														@Valor		= 10,
+														@DataHora	= @DataInicial,
+														@Loja		= 'Lojinha legal'
 
-	EXEC @Retorno = [dbo].[sp_Autorizar]	@IdAutorizacao = @IdAutorizacaoTeste;
+	EXEC @Retorno = [dbo].[sp_Autorizador]	@IdAutorizacao = @IdAutorizacaoTeste;
 
 	SELECT	@Retorno as Retorno,
 			DATEDIFF (MILLISECOND, @DataInicial, GETDATE()) AS 'Tempo (ts)';
