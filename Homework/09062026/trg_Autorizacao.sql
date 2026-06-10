@@ -7,7 +7,7 @@ IF EXISTS(SELECT 1 FROM [dbo].[sysobjects]
 	END
 
 GO
-CREATE TRIGGER [dbo].[TRG_VerificaeSaldo]
+CREATE TRIGGER [dbo].[TRG_VerificarSaldo]
 	ON [dbo].[Autorizacao]
 	FOR INSERT, DELETE, UPDATE
 
@@ -22,4 +22,12 @@ CREATE TRIGGER [dbo].[TRG_VerificaeSaldo]
 					IF EXISTS (SE)
 
 	*/
+
+	BEGIN  
+		IF EXISTS (SELECT 1 FROM deleted)
+			BEGIN
+				UPDATE AutorizacaoValor
+					SET Limite = (CASE WHEN c.Limite =  )
+
+	END
 

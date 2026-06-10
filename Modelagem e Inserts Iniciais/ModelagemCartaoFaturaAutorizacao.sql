@@ -1,4 +1,4 @@
-USE RicBank2;
+USE RickBankPower;
 
 CREATE TABLE Cartao(
 						Id			INT				IDENTITY(1,1),
