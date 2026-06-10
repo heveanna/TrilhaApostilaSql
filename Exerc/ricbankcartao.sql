@@ -1,12 +1,13 @@
 /*
-Documentacao:
+DOCUMENTAÇÃO
+
 Arquivo Fonte: ricbankcartao.sql
-Objetivo: Criar modelagem, trigger e procedures para cartao, fatura e autorizacao
+Objetivo: Criar modelagem, trigger e procedures para Cartao, Fatura e Autorizacao
 Autor: Yure
-Data Criacao: 09/06/2026
+Data Criação: 09/06/2026
 
 Exemplo:
-	Executar apos Modelagem.sql.
+	Executar após Modelagem.sql.
 */
 
 USE RicBank2;
@@ -51,9 +52,9 @@ CREATE TABLE [dbo].[Autorizacao](
 );
 GO
 
-/* ============================================================
+/* ======================================
    TRIGGER PARA ATUALIZAR SALDO DA FATURA
-   ============================================================ */
+   ====================================== */
 
 IF EXISTS (SELECT 1 FROM [dbo].[sysobjects]
 				WHERE ID = Object_Id (N'[dbo].[TRG_AtualizarSaldoFatura]')
@@ -69,7 +70,8 @@ GO
 			FOR INSERT, DELETE, UPDATE
 
 			/*
-			Documentacao:
+			DOCUMENTAÇÃO
+
 			Arquivo Fonte: ricbankcartao.sql
 			Objetivo: Atualizar saldo da fatura conforme autorizacoes aprovadas
 			Autor: Yure
@@ -112,9 +114,9 @@ GO
 			END
 GO
 
-/* ============================================================
-   PROCEDURE PARA INCLUIR CARTAO E FATURA
-   ============================================================ */
+/* ======================================
+   PROCEDURE PARA INCLUIR CARTÃO E FATURA
+   ====================================== */
 
 IF EXISTS (SELECT 1 FROM [dbo].[sysobjects]
 				WHERE ID = Object_Id (N'[dbo].[SP_InsCartao]')
@@ -134,7 +136,7 @@ CREATE PROCEDURE [dbo].[SP_InsCartao]
 	   @DataFechamento DATETIME = NULL
 	   AS
 		/*
-		DOCUMENTACAO
+		DOCUMENTAÇÃO
 
 		Arquivo Fonte: ricbankcartao.sql
 		Objetivo: Procedimento para incluir cartao e criar sua primeira fatura em aberto
@@ -182,7 +184,7 @@ CREATE PROCEDURE [dbo].[SP_InsCartao]
 					RETURN -2
 				END
 
-			-- Inclusao Cartao
+			-- Inclusão Cartão
 			INSERT INTO [dbo].[Cartao] (Numero, Validade, Bloqueado, Limite)
 				VALUES (@Numero, @Validade, @Bloqueado, @Limite)
 
@@ -194,7 +196,7 @@ CREATE PROCEDURE [dbo].[SP_InsCartao]
 					RETURN -1
 				END
 
-			-- Inclusao Fatura Inicial
+			-- Inclusão Fatura Inicial
 			INSERT INTO [dbo].[Fatura] (IdCartao, Numero, Saldo, DataFechamento, Pago)
 				VALUES (@ID, ISNULL(@NumeroFatura, @ID), 0.00, ISNULL(@DataFechamento, DATEADD(DAY, 30, GETDATE())), 0)
 
@@ -209,9 +211,9 @@ CREATE PROCEDURE [dbo].[SP_InsCartao]
 		END
 GO
 
-/* ============================================================
+/* ======================
    PROCEDURE AUTORIZADORA
-   ============================================================ */
+   ====================== */
 
 IF EXISTS (SELECT 1 FROM [dbo].[sysobjects]
 				WHERE ID = Object_Id (N'[dbo].[SP_AutorizadorCartao]')
@@ -229,7 +231,7 @@ CREATE PROCEDURE [dbo].[SP_AutorizadorCartao]
 	   @DataHora DATETIME = NULL
 	   AS
 		/*
-		DOCUMENTACAO
+		DOCUMENTAÇÃO
 
 		Arquivo Fonte: ricbankcartao.sql
 		Objetivo: Procedimento para autorizar compras conforme status, validade e limite disponivel do cartao
@@ -259,12 +261,12 @@ CREATE PROCEDURE [dbo].[SP_AutorizadorCartao]
 
 			ROLLBACK TRANSACTION
 
-			Retornos: -1 - Falha na Execucao
-					  -2 - Cartao nao encontrado
+			Retornos: -1 - Falha na Execução
+					  -2 - Cartao não encontrado
 					  -3 - Cartao bloqueado
 					  -4 - Cartao vencido
-					  -5 - Fatura em aberto nao encontrada
-					  -6 - Valor invalido
+					  -5 - Fatura em aberto não encontrada
+					  -6 - Valor inválido
 					  -7 - Limite insuficiente
 					  Retorno Positivo se refere ao Id da Autorizacao
 		*/
@@ -328,7 +330,7 @@ CREATE PROCEDURE [dbo].[SP_AutorizadorCartao]
 					SET @Autorizado = 1
 				END
 
-			-- Inclusao Autorizacao
+			-- Inclusão Autorização
 			INSERT INTO [dbo].[Autorizacao] (IdFatura, Valor, DataHora, Loja, Autorizado)
 				VALUES (@IdFatura, @Valor, ISNULL(@DataHora, GETDATE()), @Loja, @Autorizado)
 
@@ -348,4 +350,151 @@ CREATE PROCEDURE [dbo].[SP_AutorizadorCartao]
 			RETURN @ID
 		END
 GO
+
+/* ======================
+   DADOS BÁSICOS DE TESTE
+   ====================== */
+
+IF NOT EXISTS (
+	SELECT 1
+		FROM [dbo].[Cartao] WITH(NOLOCK)
+		WHERE Numero = '1111222233334444'
+)
+BEGIN
+	INSERT INTO [dbo].[Cartao] (Numero, Validade, Bloqueado, Limite)
+		VALUES ('1111222233334444', CONVERT(DATE, '20311231', 112), 0, 3000.00)
+END
+GO
+
+IF NOT EXISTS (
+	SELECT 1
+		FROM [dbo].[Cartao] WITH(NOLOCK)
+		WHERE Numero = '5555666677778888'
+)
+BEGIN
+	INSERT INTO [dbo].[Cartao] (Numero, Validade, Bloqueado, Limite)
+		VALUES ('5555666677778888', CONVERT(DATE, '20300630', 112), 1, 1500.00)
+END
+GO
+
+IF NOT EXISTS (
+	SELECT 1
+		FROM [dbo].[Cartao] WITH(NOLOCK)
+		WHERE Numero = '9999000011112222'
+)
+BEGIN
+	INSERT INTO [dbo].[Cartao] (Numero, Validade, Bloqueado, Limite)
+		VALUES ('9999000011112222', CONVERT(DATE, '20250131', 112), 0, 2000.00)
+END
+GO
+
+IF NOT EXISTS (
+	SELECT 1
+		FROM [dbo].[Fatura] WITH(NOLOCK)
+		WHERE Numero = 9001
+)
+BEGIN
+	INSERT INTO [dbo].[Fatura] (IdCartao, Numero, Saldo, DataFechamento, Pago)
+		SELECT Id, 9001, 0.00, CONVERT(DATETIME, '20260710', 112), 0
+			FROM [dbo].[Cartao]
+			WHERE Numero = '1111222233334444'
+END
+GO
+
+IF NOT EXISTS (
+	SELECT 1
+		FROM [dbo].[Fatura] WITH(NOLOCK)
+		WHERE Numero = 9002
+)
+BEGIN
+	INSERT INTO [dbo].[Fatura] (IdCartao, Numero, Saldo, DataFechamento, Pago)
+		SELECT Id, 9002, 0.00, CONVERT(DATETIME, '20260715', 112), 0
+			FROM [dbo].[Cartao]
+			WHERE Numero = '5555666677778888'
+END
+GO
+
+IF NOT EXISTS (
+	SELECT 1
+		FROM [dbo].[Fatura] WITH(NOLOCK)
+		WHERE Numero = 9003
+)
+BEGIN
+	INSERT INTO [dbo].[Fatura] (IdCartao, Numero, Saldo, DataFechamento, Pago)
+		SELECT Id, 9003, 0.00, CONVERT(DATETIME, '20250210', 112), 0
+			FROM [dbo].[Cartao]
+			WHERE Numero = '9999000011112222'
+END
+GO
+
+IF NOT EXISTS (
+	SELECT 1
+		FROM [dbo].[Autorizacao] WITH(NOLOCK)
+		WHERE Loja = 'Mercado Central'
+			AND DataHora = CONVERT(DATETIME, '2026-06-10T10:00:00', 126)
+)
+BEGIN
+	INSERT INTO [dbo].[Autorizacao] (IdFatura, Valor, DataHora, Loja, Autorizado)
+		SELECT Id, 120.50, CONVERT(DATETIME, '2026-06-10T10:00:00', 126), 'Mercado Central', 1
+			FROM [dbo].[Fatura]
+			WHERE Numero = 9001
+END
+GO
+
+IF NOT EXISTS (
+	SELECT 1
+		FROM [dbo].[Autorizacao] WITH(NOLOCK)
+		WHERE Loja = 'Farmacia Vida'
+			AND DataHora = CONVERT(DATETIME, '2026-06-10T11:30:00', 126)
+)
+BEGIN
+	INSERT INTO [dbo].[Autorizacao] (IdFatura, Valor, DataHora, Loja, Autorizado)
+		SELECT Id, 89.90, CONVERT(DATETIME, '2026-06-10T11:30:00', 126), 'Farmacia Vida', 1
+			FROM [dbo].[Fatura]
+			WHERE Numero = 9001
+END
+GO
+
+IF NOT EXISTS (
+	SELECT 1
+		FROM [dbo].[Autorizacao] WITH(NOLOCK)
+		WHERE Loja = 'Loja Premium'
+			AND DataHora = CONVERT(DATETIME, '2026-06-10T12:15:00', 126)
+)
+BEGIN
+	INSERT INTO [dbo].[Autorizacao] (IdFatura, Valor, DataHora, Loja, Autorizado)
+		SELECT Id, 5000.00, CONVERT(DATETIME, '2026-06-10T12:15:00', 126), 'Loja Premium', 0
+			FROM [dbo].[Fatura]
+			WHERE Numero = 9001
+END
+GO
+
+
+/* Consultas uteis para validação: */
+
+SELECT *
+	FROM [dbo].[Cartao]
+
+SELECT *
+	FROM [dbo].[Fatura]
+
+SELECT *
+	FROM [dbo].[Autorizacao]
+
+SELECT CT.Numero,
+	   CT.Bloqueado,
+	   CT.Validade,
+	   CT.Limite,
+	   FT.Numero AS NumeroFatura,
+	   FT.Saldo,
+	   FT.DataFechamento,
+	   AU.Valor,
+	   AU.Loja,
+	   AU.Autorizado
+	FROM [dbo].[Cartao] CT
+		INNER JOIN [dbo].[Fatura] FT
+			ON FT.IdCartao = CT.Id
+		LEFT JOIN [dbo].[Autorizacao] AU
+			ON AU.IdFatura = FT.Id
+	ORDER BY CT.Id, FT.Id, AU.Id
 
